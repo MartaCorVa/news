@@ -4,10 +4,16 @@ import * as actions from './actions'
 import * as getters from './getters'
 import * as mutations from './mutations'
 
-export default createStore({
-  namespaced: true,
-  actions,
-  getters,
-  mutations,
-  state
-})
+const newsModule = {
+    namespaced: true,
+    actions,
+    getters,
+    mutations,
+    state
+}
+
+export default createStore( {
+    modules: {
+        newsModule
+    }
+} )
