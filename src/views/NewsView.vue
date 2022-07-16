@@ -121,7 +121,7 @@ export default {
 
         setInterval( () => {
 
-            this.countNewsDB()
+            if ( this.getActualPage == 'news' ) this.countNewsDB()
 
         }  , 30000)
         
