@@ -23,3 +23,24 @@ export const loadOrderedNews = async ( { commit } ) => {
 
 }
 
+export const loadArchivedNews = async ( { commit } ) => {
+
+    const { data } = await newsApi.get( '/news/archived' )
+
+    if ( !data ) {
+        commit( 'setArchivedNews', [] )
+        return
+    }
+
+    const news = []
+    for ( let id of Object.keys( data ) ) {
+        news.push({
+            id,
+            ...data[ id ]
+        })
+    }
+
+    commit( 'setArchivedNews', news )
+
+}
+
