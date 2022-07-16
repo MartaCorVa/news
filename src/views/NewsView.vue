@@ -6,7 +6,7 @@
                 <span class="name">2022 Marta Córcoles Valle</span>
             </div>
             <hr>
-            <h1 class="fw-bold text-center">NEWS</h1>
+            <h1 id="title" class="fw-bold text-center text-uppercase">{{ title }}</h1>
             <hr>
             <nav class="navbar bg-dark text-light fw-bold">
                 <div class="container-fluid row">
@@ -14,8 +14,16 @@
                         <span>Spain, {{ date || '' }}</span>
                     </div>
                     <div class="col">
-                        <button class="float-end bg-dark text-light fw-bold custom-button">News</button>
-                        <button class="float-end bg-dark text-light fw-bold custom-button">Archive</button>
+                        <button class="float-end bg-dark text-light fw-bold custom-button"
+                            @click="goToNews"
+                        >
+                            News
+                        </button>
+                        <button class="float-end bg-dark text-light fw-bold custom-button"
+                            @click="goToArchiveNews"
+                        >
+                            Archive
+                        </button>
                     </div>
                 </div>
             </nav>
@@ -36,16 +44,24 @@
  
 <script>
 import { defineAsyncComponent } from 'vue'
-import { mapActions, mapGetters} from 'vuex'
+import { mapActions, mapGetters, mapMutations} from 'vuex'
 
 export default {
+
+    data() {
+        return {
+            title: 'news'
+        }
+    },
 
     components: {
         NewComponent: defineAsyncComponent( () => import( '@/components/NewComponent.vue' ) )
     },
  
     computed: {
-        ...mapGetters( 'newsModule', [ 'getNews' ] ),
+        ...mapGetters( 'newsModule', [ 'getNews',
+                                       'getArchivedNews',
+                                       'getActualPage' ] ),
 
         date() {
             const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July',
@@ -60,22 +76,36 @@ export default {
         },
 
         orderedNews() {
-            return this.getNews
-        }
+
+            if ( this.getActualPage == 'news' ) return this.getNews
+            return this.getArchivedNews
+
+        },
 
     },
 
     methods: {
-        ...mapActions( 'newsModule', [ 'loadOrderedNews' ] ),
+        ...mapActions( 'newsModule', [ 'loadOrderedNews',
+                                        'loadArchivedNews' ] ),
 
-        loadNews() {
+        ...mapMutations( 'newsModule', [ 'setActualPage' ] ),
+
+        goToNews() {
+            this.title = 'news'
+            this.setActualPage( 'news' )
             this.loadOrderedNews()
+        },
+
+        goToArchiveNews() {
+            this.title = 'archived news'
+            this.setActualPage( 'archivedNews' )
+            this.loadArchivedNews()
         }
 
     },
 
     created() {
-        this.loadNews()
+        this.goToNews()
     }
 
     
@@ -92,8 +122,8 @@ export default {
  
 h1 {
     font-family: 'LibreBaskerville';
-    font-size: 7.5vw;
-    letter-spacing: 30px;
+    font-size: 5vw;
+    letter-spacing: 20px;
 }
 
 h3 {
@@ -125,7 +155,12 @@ hr {
 
 .custom-button {
     border-width: 0;
-    font-size: .8vw;  
+    font-size: .8vw;
+    text-transform: uppercase; 
+
+    &:hover { 
+        letter-spacing: 4px;
+    }
 }
 
 </style>
