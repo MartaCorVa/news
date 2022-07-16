@@ -7,3 +7,16 @@ export const setNews =  ( state, news ) => {
 
 }
 
+export const setArchivedNews =  ( state, news ) => {
+
+    state.archivedNews = []
+    state.archivedNews = [ ...state.archivedNews, ...news ]
+
+}
+
+export const setActualPage =  ( state, page ) => {
+
+    state.actualPage = page
+
+}
+
