@@ -31,7 +31,7 @@
             <div class="container">
                     <NewComponent 
                         v-for="newElement in orderedNews"
-                        :key="newElement.id"
+                        :key="newElement._id"
                         :new="newElement"
                     />
             </div>
@@ -86,7 +86,8 @@ export default {
 
     methods: {
         ...mapActions( 'newsModule', [ 'loadOrderedNews',
-                                        'loadArchivedNews' ] ),
+                                        'loadArchivedNews',
+                                        'countNews' ] ),
 
         ...mapMutations( 'newsModule', [ 'setActualPage' ] ),
 
@@ -100,16 +101,32 @@ export default {
             this.title = 'archived news'
             this.setActualPage( 'archivedNews' )
             this.loadArchivedNews()
+        },
+
+        async countNewsDB() {
+
+            let count = await this.countNews()
+            const actualNews = this.orderedNews
+            if ( count != actualNews.lenght ) this.goToNews()
+
         }
 
     },
 
     created() {
         this.goToNews()
+    },
+
+    mounted() {
+
+        setInterval( () => {
+
+            this.countNewsDB()
+
+        }  , 30000)
+        
     }
-
     
-
 }
 
 </script>
