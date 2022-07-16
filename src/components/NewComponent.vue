@@ -7,13 +7,36 @@
 
     <p>{{ content }}</p>
     <h4 class="text-end mt-2 mb-4 fst-italic">{{ author }}</h4>
+    <h4 v-if="archiveDate" class="text-end mt-2 mb-4 fst-italic">Archived at {{ archiveDate }}</h4>
+    <button>
+        <i v-if="archiveDate" 
+            class="fa fa-trash"
+            @click="removeNew"
+            >
+                <span class="ms-2">Remove</span>
+        </i>
+        <i v-else 
+            class="fa fa-box-archive"
+            @click="archiveNewSelected"
+            >
+                <span class="ms-2">Archive</span>
+        </i>
+    </button>
     <hr>
 
 </template>
 
 <script>
+import Swal from 'sweetalert2'
+import { mapActions } from 'vuex'
 
 export default {
+
+    data() {
+        return {
+            page: true
+        }
+    },
 
     props: {
         new: {
@@ -23,6 +46,10 @@ export default {
     },
 
     computed: {
+
+        _id() {
+            return this.new._id
+        },
         title() {
             return this.new.title
         },
@@ -37,7 +64,63 @@ export default {
         },
         author() {
             return this.new.author
+        },
+        archiveDate() {
+            return this.new.archiveDate
         }
+
+    },
+
+    methods: {
+        ...mapActions( 'newsModule', [ 'deleteNew',
+                                       'archiveNew' ] ),
+
+        async removeNew() {
+            const { isConfirmed } = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'Once deleted, it cannot be recovered',
+                showDenyButton: true,
+                confirmButtonText: "Yes, I'm sure" 
+            })
+
+            if ( isConfirmed ) {
+                new Swal({
+                    title: 'Please wait',
+                    allowOutsideClick: false
+                })
+                Swal.showLoading()
+                await this.deleteNew( this._id )
+
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'The news has been successfully removed.',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+        },
+
+        async archiveNewSelected() {
+            new Swal( {
+                title: 'Please wait',
+                allowOutsideClick: false
+            } )
+
+            Swal.showLoading()
+            
+            await this.archiveNew( this._id )
+           
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'The news has been successfully archived.',
+                showConfirmButton: false,
+                timer: 1500
+            })
+            
+        },
+
     }
 
 }
@@ -48,7 +131,7 @@ export default {
 h2 {
     font-family: 'LibreBaskerville';
     font-size: 2.5vw;
-    letter-spacing: 15px;
+    letter-spacing: 10px;
 }
 
 h3 {
@@ -56,7 +139,7 @@ h3 {
     font-size: 1.2vw;
 }
 
-h4 {
+h4, span {
     font-family: 'LibreBaskerville';
     font-size: .8vw;  
 }
@@ -68,6 +151,11 @@ p {
 
 hr {
     height: 5px;
+}
+
+button {
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
 }
 
 </style>
